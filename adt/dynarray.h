@@ -53,7 +53,7 @@ int create_array (struct array** out, int capacity)
 
 int upsize_array (struct array* out)
 {
-    if ( (out->size + 1) < out->capacity )
+    if ( (out->size + 1) <= out->capacity )
         return 0;
 
     int* new_alloc = (int*) realloc (out->arr, (out->capacity) * 2);
