@@ -10,7 +10,7 @@ struct array
 };
 
 
-void print_array (struct array* out)
+void da_print (struct array* out)
 {
     errno = 0;
 
@@ -26,7 +26,7 @@ void print_array (struct array* out)
     printf ("}\n");
 }
 
-struct array* create_array (int capacity)
+struct array* da_create (int capacity)
 {
     errno = 0;
     
@@ -50,7 +50,7 @@ struct array* create_array (int capacity)
     return out;
 }
 
-void upsize_array (struct array* out)
+void da_upsize (struct array* out)
 {
     errno = 0;
 
@@ -66,7 +66,7 @@ void upsize_array (struct array* out)
     out->capacity *= 2;
 }
 
-int* get_element (struct array* out, int index)
+int* da_get (struct array* out, int index)
 {
     errno = 0;
 
@@ -79,7 +79,7 @@ int* get_element (struct array* out, int index)
     return &(out->arr[index]);
 }
 
-void set_element (struct array* out, int index, int value)
+void da_set (struct array* out, int index, int value)
 {
     errno = 0;
 
@@ -92,7 +92,7 @@ void set_element (struct array* out, int index, int value)
     out->arr[index] = value;
 }
 
-void insert_element (struct array* out, int index, int value)
+void da_insert (struct array* out, int index, int value)
 {
     errno = 0;
 
@@ -102,7 +102,7 @@ void insert_element (struct array* out, int index, int value)
         return;
     }
 
-    upsize_array (out);
+    da_upsize (out);
     if (errno != 0)
         return;
 
@@ -115,7 +115,7 @@ void insert_element (struct array* out, int index, int value)
     out->arr[index] = value;
 }
 
-void remove_element (struct array* out, int index)
+void da_remove (struct array* out, int index)
 {
     errno = 0;
 
@@ -134,7 +134,7 @@ void remove_element (struct array* out, int index)
     out->arr[out->size] = 0;
 }
 
-void destroy_array (struct array** out)
+void da_destroy (struct array** out)
 {
     free ( (*out)->arr );
     free ( (*out) );
