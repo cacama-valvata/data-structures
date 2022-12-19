@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <errno.h>
+#include <stdio.h>
 
 struct array
 {
@@ -9,7 +10,21 @@ struct array
 };
 
 
-int create (struct array** out, int capacity)
+int print_array (struct array* out)
+{
+    printf ("{");
+
+    for (int i = 0; i < out->size; i++)
+    {
+        printf ("%d", out->arr[i]);
+        if (i != out->size - 1)
+            printf (", ");
+    }
+
+    printf ("}\n");
+}
+
+int create_array (struct array** out, int capacity)
 {
     if (! out)
     {
@@ -36,7 +51,7 @@ int create (struct array** out, int capacity)
     return 0;
 }
 
-int upsize (struct array* out)
+int upsize_array (struct array* out)
 {
     if ( (out->size + 1) < out->capacity )
         return 0;
@@ -52,7 +67,7 @@ int upsize (struct array* out)
     return 0;
 }
 
-int get (struct array* out, int* value, int index)
+int get_element (struct array* out, int* value, int index)
 {
     if (index < 0 || index > out->size || ! value)
         return EINVAL;
@@ -62,7 +77,7 @@ int get (struct array* out, int* value, int index)
     return 0;
 }
 
-int set (struct array* out, int index, int value)
+int set_element (struct array* out, int index, int value)
 {
     if (index < 0 || index > out->size)
         return EINVAL;
@@ -71,17 +86,17 @@ int set (struct array* out, int index, int value)
     return 0;
 }
 
-int insert (struct array* out, int index, int value)
+int insert_element (struct array* out, int index, int value)
 {
     if (index < 0 || index > out->size)
         return EINVAL;
 
-    int r = upsize (out);
+    int r = upsize_array (out);
     if (r != 0)
         return r;
 
     out->size += 1;
-    for (int i = out->size; i > index; i++)
+    for (int i = out->size; i > index; i--)
     {
         out->arr[i] = out->arr[i-1];
         out->arr[i-1] = 0;
@@ -91,7 +106,7 @@ int insert (struct array* out, int index, int value)
     return 0;
 }
 
-int remove (struct array* out, int index)
+int remove_element (struct array* out, int index)
 {
     if (index < 0 || index >= out->size)
         return EINVAL;
@@ -107,10 +122,10 @@ int remove (struct array* out, int index)
     return 0;
 }
 
-int destroy (struct array** out)
+int destroy_array (struct array** out)
 {
     free ( (*out)->arr );
-    free (out);
+    free ( (*out) );
 
     return 0;
 }
