@@ -10,8 +10,10 @@ struct array
 };
 
 
-int print_array (struct array* out)
+void print_array (struct array* out)
 {
+    errno = 0;
+
     printf ("{");
 
     for (int i = 0; i < out->size; i++)
@@ -24,76 +26,85 @@ int print_array (struct array* out)
     printf ("}\n");
 }
 
-int create_array (struct array** out, int capacity)
+struct array* create_array (int capacity)
 {
-    if (! out)
-    {
-        out = NULL;
-        return EINVAL;
-    }
-
+    errno = 0;
+    
     if (capacity <= 0)
         capacity = 4;
 
     int* data = (int*) calloc (capacity, sizeof (int));
 
-    if (! data)
-    {
-        out = NULL;
-        return ENOMEM;
-    }
+    if (! data) // errno already set by calloc
+        return NULL;
 
-    (*out) = (struct array*) calloc (1, sizeof (struct array*));
-    (*out)->arr = data;
-    (*out)->size = 0;
-    (*out)->capacity = capacity;
+    struct array* out = (struct array*) calloc (1, sizeof (struct array*));
 
-    return 0;
+    if (! out) // errno already set by calloc
+        return NULL;
+
+    out->arr = data;
+    out->size = 0;
+    out->capacity = capacity;
+
+    return out;
 }
 
-int upsize_array (struct array* out)
+void upsize_array (struct array* out)
 {
-    if ( (out->size + 1) <= out->capacity )
-        return 0;
+    errno = 0;
+
+    if ( (out->size + 1) <= out->capacity )  // succeed ("fail") silently
+        return;
 
     int* new_alloc = (int*) realloc (out->arr, (out->capacity) * 2);
     
-    if (! new_alloc)
-        return ENOMEM;
+    if (! new_alloc)  // errno already set by realloc
+        return;
 
     out->arr = new_alloc;
     out->capacity *= 2;
-
-    return 0;
 }
 
-int get_element (struct array* out, int* value, int index)
+int* get_element (struct array* out, int index)
 {
-    if (index < 0 || index > out->size || ! value)
-        return EINVAL;
+    errno = 0;
 
-    *value = out->arr[index];
-    
-    return 0;
-}
-
-int set_element (struct array* out, int index, int value)
-{
     if (index < 0 || index > out->size)
-        return EINVAL;
+    {
+        errno = EINVAL;
+        return NULL;
+    }
+
+    return &(out->arr[index]);
+}
+
+void set_element (struct array* out, int index, int value)
+{
+    errno = 0;
+
+    if (index < 0 || index > out->size)
+    {
+        errno = EINVAL;
+        return;
+    }
 
     out->arr[index] = value;
-    return 0;
 }
 
-int insert_element (struct array* out, int index, int value)
+void insert_element (struct array* out, int index, int value)
 {
-    if (index < 0 || index > out->size)
-        return EINVAL;
+    errno = 0;
 
-    int r = upsize_array (out);
-    if (r != 0)
-        return r;
+    if (index < 0 || index > out->size)
+    {
+        errno = EINVAL;
+        return;
+    }
+
+    upsize_array (out);
+    if (errno != 0)
+        return;
 
     out->size += 1;
     for (int i = out->size; i > index; i--)
@@ -102,14 +113,17 @@ int insert_element (struct array* out, int index, int value)
         out->arr[i-1] = 0;
     }
     out->arr[index] = value;
-
-    return 0;
 }
 
-int remove_element (struct array* out, int index)
+void remove_element (struct array* out, int index)
 {
+    errno = 0;
+
     if (index < 0 || index >= out->size)
-        return EINVAL;
+    {
+        errno = EINVAL;
+        return;
+    }
 
     out->size -= 1;
     for (int i = index; i < out->size; i++)
@@ -118,14 +132,10 @@ int remove_element (struct array* out, int index)
         out->arr[i+1] = 0;
     }
     out->arr[out->size] = 0;
-
-    return 0;
 }
 
-int destroy_array (struct array** out)
+void destroy_array (struct array** out)
 {
     free ( (*out)->arr );
     free ( (*out) );
-
-    return 0;
 }
