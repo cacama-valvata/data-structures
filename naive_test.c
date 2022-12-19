@@ -1,5 +1,5 @@
 //#include <stdio.h>
-#include "dynarray.h"
+#include "adt/dynarray.h"
 
 void print_step_array (struct array* arr)
 {
