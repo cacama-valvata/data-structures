@@ -5,6 +5,24 @@
 
 #include "adt/dynarray.h"
 
+
+static int setup (void** state)
+{
+    struct array* arr = da_create (0);
+    *state = arr;
+
+    return 0;
+}
+
+static int teardown (void** state)
+{
+    struct array* arr = *state;
+    da_destroy (&arr);
+
+    return 0;
+}
+
+
 static void test_da_create_0 ()
 {
     struct array* arr = da_create (0);
@@ -27,7 +45,7 @@ static void test_da_create_5 ()
     da_destroy (&arr);
 }
 
-static void test_da_insert ()
+static void test_da_insert (void** state)
 {
     struct array* arr = da_create (0);
 
@@ -51,7 +69,7 @@ int main ()
     };
 
     cmocka_run_group_tests (create_tests, NULL, NULL);
-    cmocka_run_group_tests (insert_tests, NULL, NULL);
+    cmocka_run_group_tests (insert_tests, setup, teardown);
 
     return 0;
 }
