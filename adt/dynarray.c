@@ -2,12 +2,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-struct array
-{
-    int* arr;
-    int size;
-    int capacity;
-};
+#include "inc/dynarray.h"
 
 
 void da_print (struct array* out)
