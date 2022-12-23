@@ -1,8 +1,17 @@
 # Makefile
 
-all: lib/dynarray.so
+all: lib/libdynarray.so
 
-lib/dynarray.so: adt/dynarray.c inc/dynarray.h lib/
+da_install: lib/libdynarray.so inc/dynarray.h
+	cp inc/dynarray.h /usr/include/adt/
+	cp lib/libdynarray.so /usr/lib/adt/
+	ln /usr/lib/adt/libdynarray.so /usr/lib/libdynarray.so
+
+da_uninstall:
+	rm /usr/include/dynarray.h
+	rm /usr/lib/adt/libdynarray.so
+
+lib/libdynarray.so: adt/dynarray.c inc/dynarray.h lib/
 	gcc -I. -shared -o lib/libdynarray.so -fPIC adt/dynarray.c
 
 lib/:
@@ -11,8 +20,8 @@ lib/:
 clean:
 	rm -rf a.out *.o *.so
 
-#test_naive: tests/other/naive_test.c adt/dynarray.h
-#	gcc tests/other/naive_test.c -I.
+#test_naive: tests/other/naive_test.c inc/dynarray.h
+#	gcc tests/other/naive_test.c adt/dynarray.c -I.
 
 #test_cmocka: tests/other/dynarray_cmocka.c adt/dynarray.h
 #	gcc tests/other/dynarray_cmocka.c -I. -l cmocka 
