@@ -52,7 +52,7 @@ void da_upsize (struct array* out)
     if ( (out->size + 1) <= out->capacity )  // succeed ("fail") silently
         return;
 
-    int* new_alloc = (int*) realloc (out->arr, (out->capacity) * 2);
+    int* new_alloc = (int*) realloc (out->arr, (out->capacity * 2) * sizeof (int));
     
     if (! new_alloc)  // errno already set by realloc
         return;
